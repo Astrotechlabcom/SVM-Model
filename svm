@@ -1,0 +1,45 @@
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+import kaggle
+from sklearn import svm
+
+data = "/home/Documents/datasets/"
+
+#downloading the housing.csv file
+kaggle.api.authenticate()
+kaggle.api.dataset_download_files("ashydv/housing-dataset", path=data, unzip=True)   
+
+df = pd.read_csv(data+'Housing.csv')
+df.mainroad = df.mainroad.map({'yes':1, 'no':0})
+df.guestroom = df.guestroom.map({'yes':1, 'no':0})
+df.basement = df.basement.map({'yes':1, 'no':0})
+df.hotwaterheating = df.hotwaterheating.map({'yes':1, 'no':0})
+df.airconditioning = df.airconditioning.map({'yes':1, 'no':0})
+df.prefarea = df.prefarea.map({'yes':1, 'no':0})
+df.furnishingstatus = df.furnishingstatus.map({'semi-furnished': 'furnished', 'furnished' : 'furnished', 'unfurnished' :'unfurnished' })
+df.head()
+
+X = df.drop(['furnishingstatus'], axis=1).values
+y = df[['furnishingstatus']].values
+
+classes = list(df.furnishingstatus.unique())
+classes 
+
+xTrain, xTest, yTrain, yTest = train_test_split(X,y,train_size=0.75,random_state=12)
+
+# Creating a object of Logistic Regression Class
+clf = LogisticRegression()
+
+# Buliding or fitting the model with training dataset
+clf.fit(xTrain, yTrain.ravel())
+
+clf.score(xTrain, yTrain)
+
+yPred = clf.predict(xTest)
+
+print(f"Logisitic Regression Classification Report:")
+print(classification_report(yTest, yPred))
+
+cm = confusion_matrix(yTest, yPred, labels = list(classes))
+cm
